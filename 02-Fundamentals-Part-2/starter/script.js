@@ -1,3 +1,5 @@
+'use strict';
+
 function logger() {
     console.log("Hello World!");
 }
