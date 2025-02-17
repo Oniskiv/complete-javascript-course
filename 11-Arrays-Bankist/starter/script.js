@@ -74,3 +74,130 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+
+function generateUsernames() {
+  accounts.forEach(account => {
+    const username = account.owner
+      .split(" ")
+      .map(name => name[0].toLocaleLowerCase())
+      .join("");
+    account.username = username;
+  })
+}
+
+generateUsernames();
+console.table(accounts)
+
+function displayMovements(account) {
+  containerMovements.innerHTML = '';
+
+  account.movements.forEach((movement, i) => {
+    const type = movement > 0 ? "deposit" : "withdrawal";
+    const html = `
+      <div class="movements__row">
+        <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+        <div class="movements__value">${movement}</div>
+      </div>`;
+
+    containerMovements.insertAdjacentHTML("afterbegin", html);
+  });
+}
+
+function calcDisplayBalance(account) {
+  const balance = account.movements.reduce((acc, cur) => {
+    return acc + cur
+  }, 0);
+  account.balane = balance;
+  labelBalance.textContent = `${balance}€`;
+}
+
+function calcDisplaySummary(account) {
+  const incomes = account.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, cur) => {
+      return acc + cur
+    }, 0);
+  labelSumIn.textContent = `${incomes}€`;
+
+  const outcomes = account.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, cur) => {
+      return acc + cur
+    }, 0);
+  labelSumOut.textContent = `${Math.abs(outcomes)}€`;
+
+  const interest = account.movements
+    .filter(mov => mov > 0)
+    .map(mov => mov * 1.2 / 100)
+    .filter(mov => mov >= 1)
+    .reduce((acc, cur) => {
+      return acc + cur
+    }, 0);
+  labelSumInterest.textContent = `${interest}€`;
+}
+
+function refreshUI(account) {
+  displayMovements(account);
+  calcDisplayBalance(account);
+  calcDisplaySummary(account);
+}
+
+let currentAccount;
+btnLogin.addEventListener('click', function (event) {
+  event.preventDefault();
+  currentAccount = accounts
+    .find(account => account.username === inputLoginUsername.value
+      && account.pin === Number(inputLoginPin.value));
+
+  if (currentAccount) {
+    labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(" ")[0]}`;
+    containerApp.style.opacity = 1;
+
+    refreshUI(currentAccount);
+  }
+  inputLoginPin.value = inputLoginUsername.value = "";
+});
+
+btnTransfer.addEventListener('click', function (event) {
+  event.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(account => account.username === inputTransferTo.value);
+  inputTransferTo.value = inputTransferAmount.value = "";
+
+  if (amount > 0
+    && receiverAcc
+    && currentAccount.balane >= amount
+    && receiverAcc?.username !== currentAccount.username) {
+    currentAccount.movements.push(-amount)
+    receiverAcc.movements.push(amount);
+    refreshUI(currentAccount);
+  }
+});
+
+btnClose.addEventListener('click', function (event) {
+  event.preventDefault();
+  if(currentAccount.username === inputCloseUsername.value && currentAccount.pin === Number(inputClosePin.value)) {
+    const indexAccount = accounts.findIndex(account => account.username === inputCloseUsername.value
+      && account.pin === Number(inputClosePin.value));
+    const ss= accounts.splice(indexAccount, 1);
+    containerApp.style.opacity = 0;
+  }
+
+  inputCloseUsername.value = inputClosePin.value = "";
+})
+
+
+/*const julia = [3, 5, 2, 12, 7];
+const kate = [4, 1, 15, 8, 3];
+
+function checkDogs(dogsJulia, dogsKate) {
+  const dogsJuliaCopy = dogsJulia.slice(1, -2);
+  const dogs = dogsJuliaCopy.concat(dogsKate)
+  console.log(dogs)
+  dogs.forEach((dog, i, arr) => {
+    const info = dog < 3 ? `still a puppy` : `an adult, and it is ${dog} years old`;
+    console.log(`Dog number ${i + 1} ${info} is`);
+  })
+}
+
+checkDogs(julia, kate);*/
