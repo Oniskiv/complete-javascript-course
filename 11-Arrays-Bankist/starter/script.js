@@ -88,10 +88,12 @@ function generateUsernames() {
 generateUsernames();
 console.table(accounts)
 
-function displayMovements(account) {
+function displayMovements(account, sort = false) {
   containerMovements.innerHTML = '';
 
-  account.movements.forEach((movement, i) => {
+  const movs = sort ? account.movements.slice().sort((a, b) => a - b) : account.movements;
+
+  movs.forEach((movement, i) => {
     const type = movement > 0 ? "deposit" : "withdrawal";
     const html = `
       <div class="movements__row">
@@ -145,6 +147,7 @@ function refreshUI(account) {
 let currentAccount;
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault();
+
   currentAccount = accounts
     .find(account => account.username === inputLoginUsername.value
       && account.pin === Number(inputLoginPin.value));
@@ -160,6 +163,7 @@ btnLogin.addEventListener('click', function (event) {
 
 btnTransfer.addEventListener('click', function (event) {
   event.preventDefault();
+
   const amount = Number(inputTransferAmount.value);
   const receiverAcc = accounts.find(account => account.username === inputTransferTo.value);
   inputTransferTo.value = inputTransferAmount.value = "";
@@ -170,20 +174,43 @@ btnTransfer.addEventListener('click', function (event) {
     && receiverAcc?.username !== currentAccount.username) {
     currentAccount.movements.push(-amount)
     receiverAcc.movements.push(amount);
+
     refreshUI(currentAccount);
   }
 });
 
+btnLoan.addEventListener('click', function (event) {
+  event.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    currentAccount.movements.push(amount);
+
+    refreshUI(currentAccount)
+  }
+  inputLoanAmount.value = "";
+});
+
 btnClose.addEventListener('click', function (event) {
   event.preventDefault();
-  if(currentAccount.username === inputCloseUsername.value && currentAccount.pin === Number(inputClosePin.value)) {
+
+  if (currentAccount.username === inputCloseUsername.value && currentAccount.pin === Number(inputClosePin.value)) {
     const indexAccount = accounts.findIndex(account => account.username === inputCloseUsername.value
       && account.pin === Number(inputClosePin.value));
-    const ss= accounts.splice(indexAccount, 1);
+    const ss = accounts.splice(indexAccount, 1);
     containerApp.style.opacity = 0;
   }
 
   inputCloseUsername.value = inputClosePin.value = "";
+});
+
+let sortOrder = false;
+btnSort.addEventListener('click', function (event) {
+  event.preventDefault();
+
+  displayMovements(currentAccount, !sortOrder);
+  sortOrder = !sortOrder;
 })
 
 
@@ -201,3 +228,82 @@ function checkDogs(dogsJulia, dogsKate) {
 }
 
 checkDogs(julia, kate);*/
+
+/*
+This time, Julia and Kate are studying the activity levels of different dog breeds.
+
+YOUR TASKS:
+1. Store the average weight of a "Husky" in a variable "huskyWeight"
+2. Find the name of the only breed that likes both "running" and "fetch" ("dogBothActivities" variable)
+3. Create an array "allActivities" of all the activities of all the dog breeds
+4. Create an array "uniqueActivities" that contains only the unique activities (no activity repetitions). HINT: Use a technique with a special data structure that we studied a few sections ago.
+5. Many dog breeds like to swim. What other activities do these dogs like? Store all the OTHER activities these breeds like to do, in a unique array called "swimmingAdjacent".
+6. Do all the breeds have an average weight of 10kg or more? Log to the console whether "true" or "false".
+7. Are there any breeds that are "active"? "Active" means that the dog has 3 or more activities. Log to the console whether "true" or "false".
+
+BONUS: What's the average weight of the heaviest breed that likes to fetch? HINT: Use the "Math.max" method along with the ... operator.
+
+TEST DATA:
+*/
+
+/*const breeds = [
+  {
+    breed: 'German Shepherd',
+    averageWeight: 32,
+    activities: ['fetch', 'swimming'],
+  },
+  {
+    breed: 'Dalmatian',
+    averageWeight: 24,
+    activities: ['running', 'fetch', 'agility'],
+  },
+  {
+    breed: 'Labrador',
+    averageWeight: 28,
+    activities: ['swimming', 'fetch'],
+  },
+  {
+    breed: 'Beagle',
+    averageWeight: 12,
+    activities: ['digging', 'fetch'],
+  },
+  {
+    breed: 'Husky',
+    averageWeight: 26,
+    activities: ['running', 'agility', 'swimming'],
+  },
+  {
+    breed: 'Bulldog',
+    averageWeight: 36,
+    activities: ['sleeping'],
+  },
+  {
+    breed: 'Poodle',
+    averageWeight: 18,
+    activities: ['agility', 'fetch'],
+  },
+];
+
+const huskyWeight = breeds.find(bread => bread.breed === "Husky").averageWeight;
+console.log(huskyWeight);
+
+const dogBothActivities = breeds
+  .filter(bread => bread.activities.includes("running") && bread.activities.includes("fetch"))
+  .map(bread => bread.breed);
+console.log(dogBothActivities);
+
+const allActivities = breeds.flatMap(bread => bread.activities);
+console.log(allActivities);
+
+const uniqueActivities = [...new Set(allActivities)];
+console.log(uniqueActivities);
+
+const swimmingAdjacent = [...new Set(breeds
+  .filter(breed => breed.activities.includes("swimming"))
+  .flatMap(breed => breed.activities)
+  .filter(act => act !== "swimming"))];
+console.log(swimmingAdjacent);
+
+breeds.forEach(breed => console.log(`${breed.breed}: ${breed.averageWeight >= 20}`));
+
+breeds.forEach(breed => console.log(`${breed.breed}: ${breed.activities.length >= 3}`));*/
