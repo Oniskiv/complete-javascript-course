@@ -117,7 +117,13 @@ const renderError = function (msg) {
 
 const getCountryData = function (country) {
   fetch(`https://restcountries.com/v2/name/${country}`)
-    .then(response => response.json(), err => console.error(err))
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Something went wrong, status ${response.status}`);
+      }
+
+      return response.json()
+    }, err => console.error(err))
     .then(data => {
       renderCountry(data[0]);
       const neighbour = data[0].borders?.[0];
@@ -138,3 +144,15 @@ const getCountryData = function (country) {
 btn.addEventListener('click', function () {
   getCountryData('belarus');
 });
+
+const myPromise = new Promise(function (resolve, reject) {
+  if (Math.random() > 0.5) {
+    resolve('You WIN');
+  } else {
+    reject(new Error('You LOSE'));
+  }
+});
+
+myPromise
+  .then(msg => console.log(msg))
+  .catch(err => console.error(err));
