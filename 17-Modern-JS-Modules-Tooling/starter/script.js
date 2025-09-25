@@ -12,3 +12,7 @@ console.log(ShoppingCart.tq);
 
 import add from './shoppingCart.js';
 add('Orange', 1);
+
+const scores = [34, 52, 23, 45, 34, 15];
+console.log(scores);
+console.log(scores.filter(score => score > 30));
