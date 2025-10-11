@@ -1,5 +1,6 @@
 import * as model from "./model.js";
 import recipeView from "./views/recipeView";
+import searchView from "./views/searchView";
 
 import "core-js/stable";
 import "regenerator-runtime/runtime";
@@ -11,7 +12,7 @@ import "regenerator-runtime/runtime";
 
 const controlRecipes = async function() {
   try {
-    const id = window.location.hash.replace("#", "");
+    const id = window.location.hash.slice(1);
     if (!id) return;
 
     recipeView.renderSpinner();
@@ -21,7 +22,24 @@ const controlRecipes = async function() {
     recipeView.render(model.state.recipe);
   } catch (err) {
     console.error(err);
+    recipeView.renderError();
   }
 };
 
-["hashchange", "load"].forEach(ev => window.addEventListener(ev, controlRecipes));
+const controlSearchResults = async function() {
+  try {
+    const query = searchView.getQuery();
+    if(!query) return;
+
+    await model.loadSearchResults(query);
+  } catch (err){
+    console.error(err);
+  }
+}
+
+const init = function() {
+  recipeView.addHandlerRender(controlRecipes);
+  searchView.addHandlerSearch(controlSearchResults);
+}
+
+init();
