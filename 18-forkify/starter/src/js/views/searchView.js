@@ -12,10 +12,10 @@ class SearchView {
   }
 
   addHandlerSearch(handler) {
-    this._parentElement.addEventListener('submit', event => {
+    this._parentElement.addEventListener("submit", event => {
       event.preventDefault();
       handler();
-    })
+    });
   }
 }
 

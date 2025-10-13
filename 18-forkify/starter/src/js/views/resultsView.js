@@ -10,7 +10,7 @@ class ResultsView extends View {
     return this._data.map(this._generateMarkupReview).join("");
   }
 
-  _generateMarkupReview(result){
+  _generateMarkupReview(result) {
     return `
           <li class="preview">
             <a class="preview__link preview__link--active" href="#${result.id}">
