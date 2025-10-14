@@ -47,7 +47,6 @@ const controlSearchResults = async function() {
 };
 
 const controlPagination = function(goToPage) {
-  console.log(goToPage);
   resultsView.render(model.getSearchResultPage(goToPage));
   paginationView.render(model.state.search);
 };
